@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>SeqVal</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!--script src="js/path.js"></script-->
+    <link
+      rel="stylesheet" 
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+      crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+      crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+      integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+      crossorigin="anonymous">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.17.6/clusterize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.11/alertify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.31.2/handsontable.full.min.js"></script>
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.11/alertify.core.min.css">
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.11/alertify.default.min.css">
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.11/alertify.bootstrap.min.css">
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.17.6/clusterize.min.css">
+    <link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/handsontable/0.31.2/handsontable.full.min.css">
+    <script src="https://www.gstatic.com/firebasejs/3.7.4/firebase.js"></script>
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css"> -->
+    <script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
+    <!--link rel="stylesheet" href="css/ladda-themeless.min.css"-->
+    <style>
+/*!
+ * Ladda
+ * http://lab.hakim.se/ladda
+ * MIT licensed
+ *
+ * Copyright (C) 2014 Hakim El Hattab, http://hakim.se
+ */.ladda-button{position:relative}.ladda-button .ladda-spinner{position:absolute;z-index:2;display:inline-block;width:32px;height:32px;top:50%;margin-top:0;opacity:0;pointer-events:none}.ladda-button .ladda-label{position:relative;z-index:3}.ladda-button .ladda-progress{position:absolute;width:0;height:100%;left:0;top:0;background:rgba(0,0,0,0.2);visibility:hidden;opacity:0;-webkit-transition:0.1s linear all !important;-moz-transition:0.1s linear all !important;-ms-transition:0.1s linear all !important;-o-transition:0.1s linear all !important;transition:0.1s linear all !important}.ladda-button[data-loading] .ladda-progress{opacity:1;visibility:visible}.ladda-button,.ladda-button .ladda-spinner,.ladda-button .ladda-label{-webkit-transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;-moz-transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;-ms-transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;-o-transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important;transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) all !important}.ladda-button[data-style=zoom-in],.ladda-button[data-style=zoom-in] .ladda-spinner,.ladda-button[data-style=zoom-in] .ladda-label,.ladda-button[data-style=zoom-out],.ladda-button[data-style=zoom-out] .ladda-spinner,.ladda-button[data-style=zoom-out] .ladda-label{-webkit-transition:0.3s ease all !important;-moz-transition:0.3s ease all !important;-ms-transition:0.3s ease all !important;-o-transition:0.3s ease all !important;transition:0.3s ease all !important}.ladda-button[data-style=expand-right] .ladda-spinner{right:-6px}.ladda-button[data-style=expand-right][data-size="s"] .ladda-spinner,.ladda-button[data-style=expand-right][data-size="xs"] .ladda-spinner{right:-12px}.ladda-button[data-style=expand-right][data-loading]{padding-right:56px}.ladda-button[data-style=expand-right][data-loading] .ladda-spinner{opacity:1}.ladda-button[data-style=expand-right][data-loading][data-size="s"],.ladda-button[data-style=expand-right][data-loading][data-size="xs"]{padding-right:40px}.ladda-button[data-style=expand-left] .ladda-spinner{left:26px}.ladda-button[data-style=expand-left][data-size="s"] .ladda-spinner,.ladda-button[data-style=expand-left][data-size="xs"] .ladda-spinner{left:4px}.ladda-button[data-style=expand-left][data-loading]{padding-left:56px}.ladda-button[data-style=expand-left][data-loading] .ladda-spinner{opacity:1}.ladda-button[data-style=expand-left][data-loading][data-size="s"],.ladda-button[data-style=expand-left][data-loading][data-size="xs"]{padding-left:40px}.ladda-button[data-style=expand-up]{overflow:hidden}.ladda-button[data-style=expand-up] .ladda-spinner{top:-32px;left:50%;margin-left:0}.ladda-button[data-style=expand-up][data-loading]{padding-top:54px}.ladda-button[data-style=expand-up][data-loading] .ladda-spinner{opacity:1;top:26px;margin-top:0}.ladda-button[data-style=expand-up][data-loading][data-size="s"],.ladda-button[data-style=expand-up][data-loading][data-size="xs"]{padding-top:32px}.ladda-button[data-style=expand-up][data-loading][data-size="s"] .ladda-spinner,.ladda-button[data-style=expand-up][data-loading][data-size="xs"] .ladda-spinner{top:4px}.ladda-button[data-style=expand-down]{overflow:hidden}.ladda-button[data-style=expand-down] .ladda-spinner{top:62px;left:50%;margin-left:0}.ladda-button[data-style=expand-down][data-size="s"] .ladda-spinner,.ladda-button[data-style=expand-down][data-size="xs"] .ladda-spinner{top:40px}.ladda-button[data-style=expand-down][data-loading]{padding-bottom:54px}.ladda-button[data-style=expand-down][data-loading] .ladda-spinner{opacity:1}.ladda-button[data-style=expand-down][data-loading][data-size="s"],.ladda-button[data-style=expand-down][data-loading][data-size="xs"]{padding-bottom:32px}.ladda-button[data-style=slide-left]{overflow:hidden}.ladda-button[data-style=slide-left] .ladda-label{position:relative}.ladda-button[data-style=slide-left] .ladda-spinner{left:100%;margin-left:0}.ladda-button[data-style=slide-left][data-loading] .ladda-label{opacity:0;left:-100%}.ladda-button[data-style=slide-left][data-loading] .ladda-spinner{opacity:1;left:50%}.ladda-button[data-style=slide-right]{overflow:hidden}.ladda-button[data-style=slide-right] .ladda-label{position:relative}.ladda-button[data-style=slide-right] .ladda-spinner{right:100%;margin-left:0;left:16px}.ladda-button[data-style=slide-right][data-loading] .ladda-label{opacity:0;left:100%}.ladda-button[data-style=slide-right][data-loading] .ladda-spinner{opacity:1;left:50%}.ladda-button[data-style=slide-up]{overflow:hidden}.ladda-button[data-style=slide-up] .ladda-label{position:relative}.ladda-button[data-style=slide-up] .ladda-spinner{left:50%;margin-left:0;margin-top:1em}.ladda-button[data-style=slide-up][data-loading] .ladda-label{opacity:0;top:-1em}.ladda-button[data-style=slide-up][data-loading] .ladda-spinner{opacity:1;margin-top:0}.ladda-button[data-style=slide-down]{overflow:hidden}.ladda-button[data-style=slide-down] .ladda-label{position:relative}.ladda-button[data-style=slide-down] .ladda-spinner{left:50%;margin-left:0;margin-top:-2em}.ladda-button[data-style=slide-down][data-loading] .ladda-label{opacity:0;top:1em}.ladda-button[data-style=slide-down][data-loading] .ladda-spinner{opacity:1;margin-top:0}.ladda-button[data-style=zoom-out]{overflow:hidden}.ladda-button[data-style=zoom-out] .ladda-spinner{left:50%;margin-left:32px;-webkit-transform:scale(2.5);-moz-transform:scale(2.5);-ms-transform:scale(2.5);-o-transform:scale(2.5);transform:scale(2.5)}.ladda-button[data-style=zoom-out] .ladda-label{position:relative;display:inline-block}.ladda-button[data-style=zoom-out][data-loading] .ladda-label{opacity:0;-webkit-transform:scale(0.5);-moz-transform:scale(0.5);-ms-transform:scale(0.5);-o-transform:scale(0.5);transform:scale(0.5)}.ladda-button[data-style=zoom-out][data-loading] .ladda-spinner{opacity:1;margin-left:0;-webkit-transform:none;-moz-transform:none;-ms-transform:none;-o-transform:none;transform:none}.ladda-button[data-style=zoom-in]{overflow:hidden}.ladda-button[data-style=zoom-in] .ladda-spinner{left:50%;margin-left:-16px;-webkit-transform:scale(0.2);-moz-transform:scale(0.2);-ms-transform:scale(0.2);-o-transform:scale(0.2);transform:scale(0.2)}.ladda-button[data-style=zoom-in] .ladda-label{position:relative;display:inline-block}.ladda-button[data-style=zoom-in][data-loading] .ladda-label{opacity:0;-webkit-transform:scale(2.2);-moz-transform:scale(2.2);-ms-transform:scale(2.2);-o-transform:scale(2.2);transform:scale(2.2)}.ladda-button[data-style=zoom-in][data-loading] .ladda-spinner{opacity:1;margin-left:0;-webkit-transform:none;-moz-transform:none;-ms-transform:none;-o-transform:none;transform:none}.ladda-button[data-style=contract]{overflow:hidden;width:100px}.ladda-button[data-style=contract] .ladda-spinner{left:50%;margin-left:0}.ladda-button[data-style=contract][data-loading]{border-radius:50%;width:52px}.ladda-button[data-style=contract][data-loading] .ladda-label{opacity:0}.ladda-button[data-style=contract][data-loading] .ladda-spinner{opacity:1}.ladda-button[data-style=contract-overlay]{overflow:hidden;width:100px;box-shadow:0px 0px 0px 2000px transparent}.ladda-button[data-style=contract-overlay] .ladda-spinner{left:50%;margin-left:0}.ladda-button[data-style=contract-overlay][data-loading]{border-radius:50%;width:52px;box-shadow:0px 0px 0px 2000px rgba(0,0,0,0.8)}.ladda-button[data-style=contract-overlay][data-loading] .ladda-label{opacity:0}.ladda-button[data-style=contract-overlay][data-loading] .ladda-spinner{opacity:1}
+    </style>
+    <!--link rel="stylesheet" media="screen" href="css/style.css"-->
+    <style>
+#criteria { opacity:0.9; }
+#criteria > span { font-size:22px; }
+label { font-size:18px; }
+.result { padding: 10px; }
+input#submitter_name { padding-left:5px; padding-right:5px; font-size:18px; }
+#drop {
+  border:2px dashed #bbb; -moz-border-radius:10px; -webkit-border-radius:10px;
+  border-radius:5px; padding:50px 25px 50px 25px; margin-bottom:20px; text-align:center;
+  width:100%; font-size:20pt; color:#bbb;
+}
+body { background-color:#EEE; color:#555; }
+h1, h2, h3 { color:#333; }
+h1 {
+  font-size: 40px;
+  font-weight: bold;
+  line-height: 32px;
+  color: rgba(51, 51, 51, 0.8);
+  text-shadow: 1px 4px 6px #fff, 0 0 0 #000, 1px 4px 6px #fff;
+  margin-top: 50px;
+}
+::-moz-selection {
+  background: #5af;
+  color: #fff;
+  text-shadow: none;
+}
+::selection {
+  background: #5af;
+  color: #fff;
+  text-shadow: none;
+}
+.non-active { pointer-events:none; cursor:default; }
+header, #shadow { position:absolute; top:0; left:0; right:0; height:170px; background:#fff; z-index:2; }
+#shadow { box-shadow:0 2px 4px 0 rgba(170,170,170,.80); z-index:-1; }
+header h1, header #logos { display:inline-block; }
+header #logos { float:right; line-height:170px; }
+header #logos img { margin-left:50px; }
+footer { bottom:0; left:0; right:0; height:80px; padding:15px; background:#fff; z-index:2; box-shadow:4px 0 4px 2px rgba(170,170,170,.80); z-index:-1; }
+#content { margin-top:270px; }
+
+.card {
+  background: #fff;
+  box-shadow: 0 2px 4px 0 rgba(170, 170, 170, .80);
+  padding: 30px;
+  margin-bottom: 35px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 950px;
+}
+
+#expand-table-button { width: 100%; height: 35px; display: block; margin-top: 35px; }
+#expand-table-button:hover { background-color: #F3F3F3; }
+#tables-area h4 { margin-top: 30px; }
+hr { display: block; width: 100%; border-top: 1px solid #d6d6d6; margin-top: 30px; margin-bottom: 30px; }
+hr.short { width: 30%; }
+form .form-group-lg label { font-size: 18px; }
+.panel-heading h3 { text-align: center; }
+.panel-body { padding-left: 1em; padding-right: 1em; }
+.instructions { font-size: large; }
+.page-footer { padding-top: 50px; }
+
+/* For drop area. */
+#drop-area {
+  border: 3px dashed #CCC;
+  border-radius: 8px;
+  padding: 30px;
+  background-color: #F0F0F0;
+  transition: border-color 0.5s;
+  text-align: center;
+  height: 200px;
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 18px;
+  width: inherit;
+}
+#drop-area p { font-size:13px; margin-top:25px; }
+#drop-area button { margin-top:-25px; padding-left:25px; padding-right:25px; border-radius:20px; }
+#drop-area.dragenter { border-color:#A6DE2A; }
+#drop-area.dragdefault { border-color: #666; }
+#choose-file { border: none; visibility: hidden; }
+
+/* For alerts and submission history. */
+.ajs-header img { padding-right: 0.5em; }
+.success img { padding-right: 0.5em; }
+.error img { padding-right: 0.5em; }
+
+/* For qtip. */
+.qtip-red { color: #5B1515; background-color: #FDD3D0; }
+.qtip-red img { padding-right: 0.5em; }
+
+/* Triangles, based on https://tympanus.net/codrops/2013/10/03/a-collection-of-separator-styles/ */
+#shadow::after {
+  position: absolute;
+  content: '';
+  pointer-events: none;
+}
+
+.ss-style-multitriangles::after {
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  -webkit-transform: translateX(-50%) rotate(45deg);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.ss-style-multitriangles::after {
+  bottom: -25px;
+  z-index: 1;
+  background: inherit;
+  box-shadow: -50px 50px 0 #fff, 50px -50px 0 #fff, 2px 2px 4px 0 rgba(170, 170, 170, .80), -48px 52px 4px 0 rgba(170, 170, 170, .80), 52px -48px 4px 0 rgba(170, 170, 170, .80);
+}
+
+#validation-errors li { margin-bottom: 10px; }
+#validation-errors span { color: rgb(240, 71, 68); }
+#submission-history li { color: #4F8A10; margin-bottom: 10px; }
+
+/* Arrow down, from https://css-tricks.com/snippets/css/css-triangle/ */
+/* .arrow-down { background: transparent url('../img/expand.png') no-repeat center; cursor: pointer; } */
+.flip { transform: scaleY(-1); }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>SeqVal<br/>
+          <small>Interactive validation and repair of GenBank files</small>
+        </h1>
+        <div id="logos">
+          <!--a href="https://www.bu.edu"><img src="img/bu.gif" alt="BU logo"/></a-->
+        </div>
+      </div>
+    </header>
+    <div id="shadow" class="ss-style-multitriangles"></div>
+    <main id="content" class="container">
+    <section id="session-area" class="card">
+        <h2 class="text-center">Select and load GenBank files</h2>
+        <p class="text-center">Drag and drop the files of interest in order to validate them.</p>
+        <hr/>
+        <div class="row">
+          <div class="col-md-4">
+            <div id="drop-area">
+              Drag and drop here all <code>*.seq</code> files to validate
+              <br/>
+              <p>&mdash;or&mdash;</p><br/>
+            </div>
+            <input type="file" id="choose-file" accept=".xlsx,.xls,.XLSX,.XLS">
+          </div>
+          <div id="criteria" class="col-md-8">
+            <span id="status">No files loaded yet.</span>
+            <div id="list"></div>
+            <br/>
+          </div>
+          <div class="col-md-12">
+            <div id="simulation_view">
+              <button class="btn btn-primary ladda-button btn-lg btn-block" onclick="simulate(workbook_js);">Validate files</button>
+              <br/>
+              <div class="clusterize">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style="font-weight:normal;">Click <b>Validate files</b> above to begin validating and evaluating your data. This area will display the results of the evaluation.</th>
+                    </tr>
+                  </thead>
+                </table>
+              </div>
+              <br/>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="instructions" class="card">
+        <h2 class="text-center">View validation results</h2>
+        <p class="text-center">The results of the validation process are displayed below.</p>
+        <hr/>
+        <div id="scrollArea" class="clusterize-scroll">
+          <table>
+            <tbody id="contentArea" class="clusterize-content">
+              <!--tr class="clusterize-no-data">
+                <td style="text-align:left; text-decoration:underline;"><b>Simulation Progress and Results</b></td>
+              </tr-->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="container">
+        View and contribute to the source code for this page <a href="https://github.com/hicsail/seqval">on GitHub</a>.
+      </div>
+    </footer>
+    <!--script src="js/data.structs.js"></script-->
+    <!--script src="js/xlsx.full.min.js"></script-->
+    <!--script src="js/dropsheet.js"></script-->
+    <script>
+/*
+var sheets = {'ColumnName':true};
+var scoreboard;
+var _target = document.getElementById('drop-area');
+var _choose = document.getElementById('choose-file-button');
+var spinner;
+var _workstart = function() { spinner = new Spinner().spin(_target); }
+var _workend = function(clusterize) {
+  return function() {
+    spinner.stop();
+    $("#criteria").fadeTo(250, 1);
+    $('#simulation_view').show();
+    $('#spreadsheet_view').show();
+    clusterize.clear();
+  };
+};
+var _badfile = function() { alertify.alert('This file does not appear to be a valid Excel file.', function(){}); };
+var _pending = function() { alertify.alert('Please wait until the current file is processed.', function(){}); };
+var _large = function(len, cb) { alertify.confirm("This file is " + (len/(1024*1024)).toFixed(2) + " MB and may take a few moments. Your browser may lock up during this process. Continue?", cb); };
+var _failed = function(e) { alertify.alert('This format is not supported.', function(){}); };
+var boldRenderer = function (instance, td, row, col, prop, value, cellProperties) {
+  Handsontable.TextCell.renderer.apply(this, arguments);
+  $(td).css({'font-weight': 'bold'});
+};
+var make_buttons = function(sheetnames, cb) {
+  var $buttons = $('#buttons');
+  $buttons.html("");
+  sheetnames.forEach(function(s,idx) {
+    if (s in sheets) {
+      var button= $('<button/>').attr({ type:'button', name:'btn' +idx, text:s });
+      button.append(s);
+      button.click(function() { cb(idx); });
+      $buttons.append(button);
+    }
+  });
+};
+var $window, availableWidth, availableHeight;
+var calculateSize = function () {
+  availableWidth = Math.max($('#drop').width(), 600);
+  availableHeight = Math.max($window.height() - 250, 400);
+};
+var _onsheet = function(json, cols, sheetnames, select_sheet_cb) {
+  make_buttons(sheetnames, select_sheet_cb);
+  calculateSize();
+  if (!json) json = []; // Add header row for table.
+  json.unshift(function(head){var o = {}; for(i=0;i!=head.length;++i) o[head[i]] = head[i]; return o;}(cols));
+  calculateSize();
+  $("#hot").handsontable({
+    data: json,
+    startRows: 5, startCols: 3, fixedRowsTop: 1,
+    stretchH: 'all',
+    rowHeaders: true,
+    columns: cols.map(function(x) { return {data:x}; }),
+    colHeaders: cols.map(function(x,i) { return XLS.utils.encode_col(i); }),
+    cells: function (r,c,p) { if(r === 0) this.renderer = boldRenderer; },
+    width: function () { return availableWidth; },
+    height: function () { return availableHeight; },
+    stretchH: 'all'
+  });
+};
+$(document).ready(function() {
+  $window = $(window);
+  $window.on('resize', calculateSize);
+  $( document ).on( "submitReadyEvent", function( event, arg1, arg2 ) {
+    console.log( "submission ready!" );
+    $("#submit").removeClass('disabled');
+    $("#submit").removeClass('non-active');
+    $("#submit").addClass('enabled');
+  });
+});
+var clusterize = new Clusterize({scrollId:'scrollArea', contentId:'contentArea'});
+var workbook_js = DropSheet({
+  drop: _target, choose: _choose,
+  on: { workstart: _workstart, workend: _workend(clusterize), sheet: _onsheet },
+  errors: { badfile: _badfile, pending: _pending, failed: _failed, large: _large }
+}, sheets);
+$('#tables-area').hide();
+$('#expand-table-button').click(function (e) {
+  $('#tables-area').slideToggle();
+  $(e.target).toggleClass('flip');
+});*/
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+    <script>
+function addEventHandler(obj, evt, handler) {
+    if (obj.addEventListener)
+        obj.addEventListener(evt, handler, false); // W3C method.
+    else if(obj.attachEvent)
+        obj.attachEvent('on'+evt, handler); // IE method.
+    else
+        obj['on'+evt] = handler; // Legacy method.
+}
+
+if (window.FileReader) {
+  var drop_area; 
+  addEventHandler(window, 'load', function() {
+    var status = document.getElementById('status');
+    drop_area = document.getElementById('drop-area');
+    var list = document.getElementById('list');
+
+    function cancel(e) {
+      if (e.preventDefault) { e.preventDefault(); }
+      return false;
+    }
+  
+    // Tells the browser that we can drop on this target.
+    addEventHandler(drop_area, 'dragover', cancel);
+    addEventHandler(drop_area, 'dragenter', cancel);
+
+    addEventHandler(drop_area, 'drop', function (e) {
+      e = e || window.event; // Get window.event if e argument missing (in IE).
+      if (e.preventDefault) { e.preventDefault(); } // Stops browser from redirecting off to the image.
+
+      var dt = e.dataTransfer, files = dt.files;
+      for (var i = 0; i < files.length; i++) {
+        var file = files[i];
+        var reader = new FileReader();
+      
+        // Attach event handlers here.
+        reader.readAsDataURL(file);
+        addEventHandler(reader, 'loadend', function(e, file) {
+          var bin = this.result, newFile = document.createElement('div');
+          newFile.innerHTML = ''+file.name+' ('+Math.round(file.size/1024)+' KB)';
+          list.appendChild(newFile);  
+          var fileNumber = list.getElementsByTagName('div').length;
+          status.innerHTML = fileNumber < files.length 
+                           ? 'Loaded 100% of file '+fileNumber+' of '+files.length+'...' 
+                           : 'Loaded '+fileNumber+' files.';
+          //var img = document.createElement("img"); 
+          //img.file = file;   
+          //img.src = bin;
+          //list.appendChild(img);
+        }.bindToEventHandler(file));
+      } // For each file.
+      return false;
+    });
+
+    Function.prototype.bindToEventHandler = function bindToEventHandler() {
+      var handler = this;
+      var boundParameters = Array.prototype.slice.call(arguments);
+      return function(e) {
+        e = e || window.event; // Get window.event if e argument missing (in IE)   
+        boundParameters.unshift(e);
+        handler.apply(this, boundParameters);
+      };
+    };
+  });
+} else { 
+  document.getElementById('status').innerHTML = 'Your browser does not support the HTML5 FileReader.';
+}
+    </script>
+  </body>
+</html>

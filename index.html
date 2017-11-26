@@ -20,6 +20,7 @@
       integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
       crossorigin="anonymous">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xregexp/3.2.0/xregexp-all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clusterize.js/0.17.6/clusterize.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alertify.js/0.3.11/alertify.min.js"></script>
@@ -200,7 +201,7 @@ form .form-group-lg label { font-size: 18px; }
           </div>
           <div class="col-md-12">
             <div id="simulation_view">
-              <button class="btn btn-primary ladda-button btn-lg btn-block" onclick="simulate(workbook_js);">Validate files</button>
+              <button class="btn btn-primary ladda-button btn-lg btn-block" onclick="validate();">Validate files</button>
               <br/>
               <div class="clusterize">
                 <table>
@@ -324,6 +325,76 @@ $('#expand-table-button').click(function (e) {
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
     <script>
+var docs = [];
+
+function validate() {
+  var featuresList = featuresListFromFiles(docs);
+  console.log(featuresList);
+}
+
+function seqData(s) {
+  return s.substr(s.indexOf("\nORIGIN")+7).replace(new RegExp("(\\W)|(\\d+)", 'g'), "");
+}
+
+function featuresListFromFiles(docs) {
+  var featuresList = {};
+  for (var i = 0; i < docs.length; i++) {
+    var features = {}, doc = docs[i], found = false;
+    XRegExp.forEach(doc.raw, new RegExp("((complement\\()?(\\d+\\.\\.\\d+)(\\))?)", 'g'), function(match) {
+      var dna_title = "", label = "", complement = false;
+      feature_title = doc.raw.substr(0,match.index).trim().split(" ").slice(-1)[0]; // Match 'promoter' or 'misc_feature', and so on.
+      complement = doc.raw.substr(match.index, 10) == "complement";
+      var doc_sub = doc.raw.substr(match.index + match[0].length);
+      var stop_seq = doc_sub.search(new RegExp("(([a-zA-Z]|_)+\\s+((complement\\()?(\\d+\\.\\.\\d+)(\\))?))|(\nORIGIN)", 'g'));
+      console.log();
+      var endSearch = stop_seq + match.index + match[0].length;
+      var entry = doc.raw.substring(match.index + match[0].length, endSearch);
+
+      var re_dt = new RegExp("/dnas_title=(.*)\n", 'g');
+      var m_dt = re_dt.exec(entry);
+      var dna_title = (m_dt != null) ? m_dt[1].replace(/['"]+/g, '') : "";
+
+      var re_lbl = new RegExp("/label=(.*)\n", 'g');
+      var m_lbl = re_lbl.exec(entry);
+      var label = (m_lbl != null) ? m_lbl[1].replace(/['"]+/g, '') : "";
+
+      /*        
+        if ("promoter" in dna_title.lower() or "promoter" in label.lower()) and not ("promoter" in feature_title.lower()):
+            AddToSheet(ws, currentRow, "FEATURE", "Warning: promoter is mentioned in the 'label'/'dnas_title' but feature does not have 'promoter' in title, i.e. currently might be labeled 'misc_feature' right now", warn_style, file["fileName"], '', label, '')
+      */
+
+      var bounds = match[1].replace("complement(", "").replace(")","").split("..");
+      var partSequence = doc.seq.substring(bounds[0]-1, bounds[1]);
+      var compSequence =
+        partSequence
+          .split("").reverse().join("")
+          .replace("T", "Y").replace("C", "Z").replace("A", "T")
+          .replace("G", "C").replace("Y", "A").replace("Z", "G");
+      
+      features[match.index] = {
+          "dna_title": dna_title, 
+          "label": label, 
+          "seq_ends": bounds[0], 
+          "feature": feature_title,
+          "sequence": partSequence,
+          "comp_sequence": compSequence,
+          "complement": complement
+        };
+      found = true;
+    }); // For each match.
+
+    if (found)
+      featuresList[doc.name] = features;
+
+  } // For each file.
+
+  return featuresList;
+}
+
+function warningsFromFeatures(fileToFeatures) {
+
+}
+
 function addEventHandler(obj, evt, handler) {
     if (obj.addEventListener)
         obj.addEventListener(evt, handler, false); // W3C method.
@@ -334,7 +405,7 @@ function addEventHandler(obj, evt, handler) {
 }
 
 if (window.FileReader) {
-  var drop_area; 
+  var drop_area;
   addEventHandler(window, 'load', function() {
     var status = document.getElementById('status');
     drop_area = document.getElementById('drop-area');
@@ -344,11 +415,10 @@ if (window.FileReader) {
       if (e.preventDefault) { e.preventDefault(); }
       return false;
     }
-  
-    // Tells the browser that we can drop on this target.
+
+    // Tell the browser that we can drop on this target.
     addEventHandler(drop_area, 'dragover', cancel);
     addEventHandler(drop_area, 'dragenter', cancel);
-
     addEventHandler(drop_area, 'drop', function (e) {
       e = e || window.event; // Get window.event if e argument missing (in IE).
       if (e.preventDefault) { e.preventDefault(); } // Stops browser from redirecting off to the image.
@@ -357,21 +427,18 @@ if (window.FileReader) {
       for (var i = 0; i < files.length; i++) {
         var file = files[i];
         var reader = new FileReader();
-      
+
         // Attach event handlers here.
-        reader.readAsDataURL(file);
+        reader.readAsText(file);
         addEventHandler(reader, 'loadend', function(e, file) {
-          var bin = this.result, newFile = document.createElement('div');
+          var txt = this.result, newFile = document.createElement('div');
           newFile.innerHTML = ''+file.name+' ('+Math.round(file.size/1024)+' KB)';
           list.appendChild(newFile);  
           var fileNumber = list.getElementsByTagName('div').length;
           status.innerHTML = fileNumber < files.length 
                            ? 'Loaded 100% of file '+fileNumber+' of '+files.length+'...' 
                            : 'Loaded '+fileNumber+' files.';
-          //var img = document.createElement("img"); 
-          //img.file = file;   
-          //img.src = bin;
-          //list.appendChild(img);
+          docs.push({"name":file.name, "obj":file, "raw":txt, "seq":seqData(txt)});
         }.bindToEventHandler(file));
       } // For each file.
       return false;

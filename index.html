@@ -137,12 +137,7 @@ form .form-group-lg label { font-size: 18px; }
 .qtip-red img { padding-right: 0.5em; }
 
 /* Triangles, based on https://tympanus.net/codrops/2013/10/03/a-collection-of-separator-styles/ */
-#shadow::after {
-  position: absolute;
-  content: '';
-  pointer-events: none;
-}
-
+#shadow::after { position:absolute; content:''; pointer-events:none; }
 .ss-style-multitriangles::after {
   left: 50%;
   width: 50px;
@@ -150,7 +145,6 @@ form .form-group-lg label { font-size: 18px; }
   -webkit-transform: translateX(-50%) rotate(45deg);
   transform: translateX(-50%) rotate(45deg);
 }
-
 .ss-style-multitriangles::after {
   bottom: -25px;
   z-index: 1;
@@ -162,9 +156,10 @@ form .form-group-lg label { font-size: 18px; }
 #validation-errors span { color: rgb(240, 71, 68); }
 #submission-history li { color: #4F8A10; margin-bottom: 10px; }
 
-/* Arrow down, from https://css-tricks.com/snippets/css/css-triangle/ */
-/* .arrow-down { background: transparent url('../img/expand.png') no-repeat center; cursor: pointer; } */
-.flip { transform: scaleY(-1); }
+table th { margin:0px 10px 0px 10px; padding:2px 10px 2px 10px; border:1px solid #777777; }
+table td { margin:0px 10px 0px 10px; padding:2px 10px 2px 10px; border:1px solid #777777; font-size:10px; }
+
+.clusterize-scroll {  max-height:800px; }
     </style>
   </head>
   <body>
@@ -200,17 +195,11 @@ form .form-group-lg label { font-size: 18px; }
             <br/>
           </div>
           <div class="col-md-12">
-            <div id="simulation_view">
+            <div>
               <button class="btn btn-primary ladda-button btn-lg btn-block" onclick="validate();">Validate files</button>
               <br/>
-              <div class="clusterize">
-                <table>
-                  <thead>
-                    <tr>
-                      <th style="font-weight:normal;">Click <b>Validate files</b> above to begin validating and evaluating your data. This area will display the results of the evaluation.</th>
-                    </tr>
-                  </thead>
-                </table>
+              <div>
+                Click <b>Validate files</b> above to begin validating and evaluating your data. This area will display the results of the evaluation.</th>
               </div>
               <br/>
             </div>
@@ -311,7 +300,6 @@ $(document).ready(function() {
     $("#submit").addClass('enabled');
   });
 });
-var clusterize = new Clusterize({scrollId:'scrollArea', contentId:'contentArea'});
 var workbook_js = DropSheet({
   drop: _target, choose: _choose,
   on: { workstart: _workstart, workend: _workend(clusterize), sheet: _onsheet },
@@ -326,10 +314,20 @@ $('#expand-table-button').click(function (e) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
     <script>
 var docs = [];
+var clusterize = new Clusterize({scrollId:'scrollArea', contentId:'contentArea'});
 
 function validate() {
+  clusterize.clear();
+  clusterize.append(['<tr><th>Error Type</th><th>Notes</th><th>#1 File</th><th>#1 Part Label</th><th>#1 Seq.</th><th>#2 File</th><th>#2 Part Label</th><th>#2 Seq.</th></tr>']);
   var featuresList = featuresListFromFiles(docs);
-  console.log(featuresList);
+  warningsFromFeatures(featuresList);
+}
+
+function notify(type, note, file1, file2, data1, data2) {
+  clusterize.append(['<tr><td>'+type+'</td><td>'+note+'</td>'+
+                     '<td>'+file1+'</td>'+'<td>'+data1.label+'</td><td>'+data1.sequence+'</td>'+
+                     '<td>'+file2+'</td><td>'+data2.label+'</td><td>'+data2.sequence+'</td></tr>'
+                     ]);
 }
 
 function seqData(s) {
@@ -346,7 +344,6 @@ function featuresListFromFiles(docs) {
       complement = doc.raw.substr(match.index, 10) == "complement";
       var doc_sub = doc.raw.substr(match.index + match[0].length);
       var stop_seq = doc_sub.search(new RegExp("(([a-zA-Z]|_)+\\s+((complement\\()?(\\d+\\.\\.\\d+)(\\))?))|(\nORIGIN)", 'g'));
-      console.log();
       var endSearch = stop_seq + match.index + match[0].length;
       var entry = doc.raw.substring(match.index + match[0].length, endSearch);
 
@@ -357,11 +354,9 @@ function featuresListFromFiles(docs) {
       var re_lbl = new RegExp("/label=(.*)\n", 'g');
       var m_lbl = re_lbl.exec(entry);
       var label = (m_lbl != null) ? m_lbl[1].replace(/['"]+/g, '') : "";
-
-      /*        
-        if ("promoter" in dna_title.lower() or "promoter" in label.lower()) and not ("promoter" in feature_title.lower()):
-            AddToSheet(ws, currentRow, "FEATURE", "Warning: promoter is mentioned in the 'label'/'dnas_title' but feature does not have 'promoter' in title, i.e. currently might be labeled 'misc_feature' right now", warn_style, file["fileName"], '', label, '')
-      */
+    
+      if ((dna_title.toLowerCase().includes("promoter") || label.toLowerCase("promoter").includes("promoter")) && (!(feature_title.toLowerCase().includes("promoter"))))
+        notify("FEATURE", "Warning: promoter is mentioned in the 'label'/'dnas_title' but feature does not have 'promoter' in title (i.e., currently might be labeled 'misc_feature')", doc.name, '', {label:label, sequence:''}, {label:'', sequence:''});
 
       var bounds = match[1].replace("complement(", "").replace(")","").split("..");
       var partSequence = doc.seq.substring(bounds[0]-1, bounds[1]);
@@ -391,17 +386,51 @@ function featuresListFromFiles(docs) {
   return featuresList;
 }
 
-function warningsFromFeatures(fileToFeatures) {
-
+function warningsFromFeatures(featuresList) {
+  var seen = {};
+  for (var fi in featuresList) {
+    for (var fk in featuresList) {
+      if ((fi != fk) && !(fk in seen)) {
+        for (var fi_sub in featuresList[fi]) {
+          for (var fk_sub in featuresList[fk]) {
+            var ei = featuresList[fi][fi_sub], ek = featuresList[fk][fk_sub];
+            if (ei.sequence == ek.sequence) {
+              if (ei.label != ek.label) {
+                if (ei.label.replace(new RegExp("\\(\\d+\\)", 'g'), "") == ek.label.replace(new RegExp("\\(\\d+\\)", 'g'), ""))
+                  notify("LABEL", "Warning: why is there '(#)' on the end of this part label?", fi, fk, ei, ek);
+                else
+                  notify("LABEL", "Error: same sequence, but different labels",  fi, fk, ei, ek);
+              }
+            }
+            if  (  ei.label != "" && ek.label != ""
+               && (ei.label.replace(new RegExp("\\(\\d+\\)", 'g'), "") == ek.label.replace(new RegExp("\\(\\d+\\)", 'g'), ""))       
+               ) {
+              if (ei.sequence != ek.sequence) {
+                if (ei.comp_sequence == ek.sequence && ei.complement)
+                  continue;
+                else if (ek.comp_sequence == ei.sequence && ek.complement)
+                  continue;
+                else if ((ei.comp_sequence == ek.sequence) || (ek.comp_sequence == ei.comp_sequence))
+                  notify("SEQUENCE", "Warning: I believe one of these sequences was mislabeled in the GenBank file (i.e., 'complement(#..#)'' instead of '#..#')", fi, fk, ei, ek);
+                else
+                  notify("SEQUENCE", "Error: ignoring the '(#)' on the end of the label, these labels are essentially the same and have dissimilar sequences", fi, fk, ei, ek);
+              }
+            }
+          }
+        } // For all pairs of subsequences.
+      }
+    } 
+    seen[fi] = true;
+  } // For all pairs of files.
 }
 
 function addEventHandler(obj, evt, handler) {
-    if (obj.addEventListener)
-        obj.addEventListener(evt, handler, false); // W3C method.
-    else if(obj.attachEvent)
-        obj.attachEvent('on'+evt, handler); // IE method.
-    else
-        obj['on'+evt] = handler; // Legacy method.
+  if (obj.addEventListener)
+    obj.addEventListener(evt, handler, false); // W3C method.
+  else if(obj.attachEvent)
+    obj.attachEvent('on'+evt, handler); // IE method.
+  else
+    obj['on'+evt] = handler; // Legacy method.
 }
 
 if (window.FileReader) {
